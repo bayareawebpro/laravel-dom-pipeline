@@ -10,9 +10,9 @@
 ## Usage: 
 ```php
 $modified = DomPipeline::make($html, [
-    LazyLoadImage::class,
-    LazyLoadVideos::class,
-    TableOfContents::class,
+    LazyLoadImageTags::class,
+    LazyLoadVideoTags::class,
+    BuildTableOfContents::class,
 ]);
 ```
 
