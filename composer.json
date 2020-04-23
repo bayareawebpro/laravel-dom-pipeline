@@ -1,0 +1,57 @@
+{
+    "name": "bayareawebpro/laravel-dom-pipeline",
+    "description": "A DOM Pipeline Utility for Modifying HTML",
+    "keywords": [
+        "bayareawebpro",
+        "laravel-dom-pipeline"
+    ],
+    "homepage": "https://github.com/bayareawebpro/laravel-dom-pipeline",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Dan Alvidrez",
+            "email": "dan@bayareawebpro.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "ext-dom": "*",
+        "ext-libxml": "*",
+        "illuminate/pipeline": "^6.0|^7.0",
+        "illuminate/support": "^6.0|^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0",
+        "phpunit/phpunit": "^8.5",
+        "nunomaduro/larastan": "^0.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "BayAreaWebPro\\DomPipeline\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BayAreaWebPro\\DomPipeline\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "lint": "vendor/bin/phpstan analyse"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BayAreaWebPro\\DomPipeline\\DomPipelineServiceProvider"
+            ],
+            "aliases": {
+                "DomPipeline": "DomPipeline"
+            }
+        }
+    }
+}
