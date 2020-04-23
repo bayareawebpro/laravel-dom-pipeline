@@ -15,9 +15,9 @@ any other tags outside of the body scope.
 ```php
 use BayAreaWebPro\DomPipeline\DomPipeline;
 use My\Pipes\{
-    LazyLoadImageTags::class,
-    LazyLoadVideoTags::class,
-    BuildTableOfContents::class
+    LazyLoadImageTags,
+    LazyLoadVideoTags,
+    BuildTableOfContents
 };
 
 $modified = DomPipeline::make($html, [
