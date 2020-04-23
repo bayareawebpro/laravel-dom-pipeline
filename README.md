@@ -9,6 +9,13 @@
 
 ## Usage: 
 ```php
+use BayAreaWebPro\DomPipeline\DomPipeline;
+use My\Pipes\{
+    LazyLoadImageTags::class,
+    LazyLoadVideoTags::class,
+    BuildTableOfContents::class
+};
+
 $modified = DomPipeline::make($html, [
     LazyLoadImageTags::class,
     LazyLoadVideoTags::class,
