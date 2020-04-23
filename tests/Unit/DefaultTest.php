@@ -9,7 +9,7 @@ use DOMXPath;
 
 class DefaultTest extends TestCase
 {
-    public function test_can()
+    public function test_can_pipe_dom_and_only_return_body_children()
     {
         $html = <<<HTML
         <h1>Test</h1>
