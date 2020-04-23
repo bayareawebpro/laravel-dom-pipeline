@@ -1,15 +1,25 @@
 # Laravel DOM Pipeline
 
+
 ![](https://github.com/bayareawebpro/laravel-dom-pipeline/workflows/ci/badge.svg)
 ![](https://img.shields.io/packagist/dt/bayareawebpro/laravel-dom-pipeline.svg)
 ![](https://img.shields.io/github/v/release/bayareawebpro/laravel-dom-pipeline.svg)
 ![](https://img.shields.io/badge/License-MIT-success.svg)
 
+
+```shell script
+composer require bayareawebpro/laravel-dom-pipeline
+```
+
 > https://packagist.org/packages/bayareawebpro/laravel-dom-pipeline
 
-This package is for working with HTML content 
-tags. It will not return the `<body>` tag or 
-any other tags outside of the body scope.
+Laravel DOM Pipeline allows you to pipe HTML content through a series of classes 
+which can be helpful with sanitization and server-side enhancement / modification of page 
+elements. The pipeline will not return the `<body>` tag or any other tags outside of the 
+body scope. 
+
+> "libxml_use_internal_errors" is enabled allow any type of tag to operated on. 
+See DomPipelineService::class (line 25).
 
 ## Usage: 
 ```php
