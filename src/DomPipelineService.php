@@ -24,7 +24,7 @@ class DomPipelineService
         $this->pipes = $pipes;
     }
 
-    public function process($html)
+    public function process(?string $html = null)
     {
         if (empty($html)) return $html;
 
