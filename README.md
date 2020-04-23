@@ -34,13 +34,37 @@ use DOMXPath;
 use Closure;
 
 class UpdateHeaders{
-    public function handle(DOMDocument $dom, Closure $next){
+    public function handle(DOMDocument $dom, Closure $next)
+    {
         $xpath = new DOMXPath($dom);
         foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
-            $node->nodeValue = $node->tagName;
+            $node->nodeValue = "This is a {$node->tagName} tag.";
         }
         return $next($dom);
     }
 }
 ```
 
+### Replace Element with Fragment
+
+```php
+use DOMDocument;
+use DOMXPath;
+use Closure;
+
+class ReplaceWithFragment{
+    public function handle(DOMDocument $dom, \Closure $next)
+    {
+        $fragment = $dom->createDocumentFragment();
+        $fragment->appendXML(<<<HTML
+        <div class="my-4 p-3 shadow rounded border border-green-500 text-center">
+            My Special Element
+        </div>
+        HTML);
+        $h1 = $dom->getElementsByTagName('h1')->item(0);
+        $body = $dom->getElementsByTagName('body')->item(0);
+        $body->replaceChild($fragment, $h1);
+        return $next($dom);
+    }
+}
+```
