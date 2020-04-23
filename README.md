@@ -9,7 +9,7 @@
 
 This package is for working with HTML content 
 tags. It will not return the `<body>` tag or 
-any other tags outside of the `<body>`.
+any other tags outside of the body scope.
 
 ## Usage: 
 ```php
