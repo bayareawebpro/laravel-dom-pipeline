@@ -53,7 +53,7 @@ use DOMXPath;
 use Closure;
 
 class ReplaceWithFragment{
-    public function handle(DOMDocument $dom, \Closure $next)
+    public function handle(DOMDocument $dom, Closure $next)
     {
         $fragment = $dom->createDocumentFragment();
         $fragment->appendXML(<<<HTML
