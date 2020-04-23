@@ -52,4 +52,21 @@ class DefaultTest extends TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function test_can_pipe_null()
+    {
+        $html = null;
+        $actual = DomPipeline::make($html, [
+            new class{
+                public function handle(DOMDocument $dom, \Closure $next){
+                    $xpath = new DOMXPath($dom);
+                    foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
+                        $node->nodeValue = $node->tagName;
+                    }
+                    return $next($dom);
+                }
+            }
+        ]);
+        $this->assertSame($html, $actual);
+    }
 }

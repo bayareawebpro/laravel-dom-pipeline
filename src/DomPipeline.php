@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see \BayAreaWebPro\DomPipeline\DomPipelineService
- * @method static DomPipelineService make(string $html, array $pipes)
+ * @method static DomPipelineService make(?string $html = null, array $pipes = [])
  */
 class DomPipeline extends Facade
 {
