@@ -287,9 +287,9 @@ class Tables
 namespace App\Services\Html\Sanitizers;
 
 use Illuminate\Support\Str;
-use App\Repository;
 use DOMDocument;
 use DOMNode;
+use Closure;
 
 class Links
 {
@@ -320,7 +320,7 @@ class Links
         '#',
     ];
 
-    public function handle(DOMDocument $dom, $next)
+    public function handle(DOMDocument $dom, Closure $next)
     {
         foreach($dom->getElementsByTagName('a') as $node){
             $this->removeBlacklistedAttributes($node);
@@ -349,7 +349,7 @@ class Links
         $node->setAttribute('href', $this->fixProtocol($node->getAttribute('href')));
     }
 
-    protected function formatMailable(DOMNode $node)
+    protected function formatMailable(DOMNode $node): void
     {
         if(!$node->hasAttribute('title')){
 
@@ -361,13 +361,13 @@ class Links
         }
     }
 
-    protected function formatHomepage(DOMNode $node)
+    protected function formatHomepage(DOMNode $node): void
     {
         $node->setAttribute('href', "/");
         $node->setAttribute('title', config('app.name'));
     }
 
-    protected function formatInternalLink(DOMNode $node)
+    protected function formatInternalLink(DOMNode $node): void
     {
         $slug = $this->toLowerCaseSlug($node->getAttribute('href'));
 
@@ -380,7 +380,7 @@ class Links
         }
     }
 
-    protected function formatTelLink(DOMNode $node)
+    protected function formatTelLink(DOMNode $node): void
     {
         $formatted = $this->filterNumeric($node->getAttribute('href'));
 
@@ -400,12 +400,12 @@ class Links
         }
     }
 
-    protected function unwrapNode(DOMNode $node)
+    protected function unwrapNode(DOMNode $node): void
     {
         $node->nodeValue = strip_tags($node->nodeValue);
     }
 
-    protected function removeBlacklistedAttributes(DOMNode $node)
+    protected function removeBlacklistedAttributes(DOMNode $node): void
     {
         foreach ($this->blackList as $attribute) {
             $node->removeAttribute($attribute);
@@ -418,7 +418,7 @@ class Links
         return empty($href) || in_array($this->condenseValue($href), $this->invalid);
     }
 
-    protected function condenseValue($value)
+    protected function condenseValue($value): string
     {
         return trim((string)$value);
     }
@@ -465,7 +465,7 @@ class Links
         );
     }
 
-    protected function hasInvalidProtocol($url)
+    protected function hasInvalidProtocol($url): bool 
     {
         return Str::startsWith((string)$url, ['//']);
     }
