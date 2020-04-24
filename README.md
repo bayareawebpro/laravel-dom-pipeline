@@ -139,7 +139,7 @@ class LazyLoadVideos
      */
     protected function lazyLoad(DOMDocument $dom, DOMNode $node): void
     {
-        if(!$node->parentNode) return;
+        if(is_null($node->parentNode)) return;
 
         // Match the YouTube Video ID.
         // https://stackoverflow.com/questions/2936467/parse-youtube-video-id-using-preg-match
@@ -209,12 +209,71 @@ class TableOfContents
      */
     protected function makeBookmark(DOMNode $node, string $text): StdClass
     {
-        $anchor = (object)[
+        // Create the bookmark item.
+        $bookmark = (object)[
           'anchor' => Str::slug($text),
           'text'   => Str::title(Str::replaceLast('.', '', $text)),
         ];
-        $node->setAttribute('id', $anchor);
-        return $anchor;
+
+        // Link the bookmark to the header using the ID.
+        $node->setAttribute('id', $bookmark->anchor);
+
+        return $bookmark;
     }
 }
+```
+
+
+### Make Tables Responsive
+
+Convert tables to bootstrap equivalent style.
+
+```php
+<?php declare(strict_types=1);
+
+namespace App\Services\Html\Formatters;
+
+use Closure;
+use DOMNode;
+use DOMDocument;
+
+class Tables
+{
+    /**
+     * @param DOMDocument $dom
+     * @param \Closure $next
+     * @return mixed
+     */
+    public function handle(DOMDocument $dom, Closure $next)
+    {
+        $xpath = new \DOMXPath($dom);
+        foreach($xpath->query('//table') as $node){
+            $this->makeResponsive($dom, $node);
+        }
+        return $next($dom);
+    }
+
+    /**
+     * Wrap Responsive
+     * @param DOMDocument $dom
+     * @param DOMNode $node
+     */
+    protected function makeResponsive(DOMDocument $dom, DOMNode $node): void
+    {            
+        if(is_null($node->parentNode)) return;
+        
+        // Create the wrapper element.
+        $div = $dom->createElement('div');
+
+        // Apply classes to the element.
+        $div->setAttribute('class','table table-responsive table-striped table-hover');
+
+        // Clone and append the table to the element.
+        $div->appendChild($node->cloneNode(true));
+
+        // Swap the table for the new wrapped version.
+        $node->parentNode->replaceChild($div,$node);
+    }
+}
+
 ```
