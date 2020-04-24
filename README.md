@@ -48,6 +48,7 @@ class UpdateHeaders{
     {
         $xpath = new DOMXPath($dom);
         foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
+            // Change the header tags content.
             $node->nodeValue = "This is a {$node->tagName} tag.";
         }
         return $next($dom);
@@ -55,26 +56,164 @@ class UpdateHeaders{
 }
 ```
 
-### Replace Element with Fragment
-
 ```php
-use DOMDocument;
-use DOMXPath;
-use Closure;
+<?php declare(strict_types=1);
 
-class ReplaceWithFragment{
+namespace App\Services\Html\Formatters;
+
+use Closure;
+use DOMNode;
+use DOMDocument;
+
+class LazyLoadImages
+{
+    /**
+     * @param DOMDocument $dom
+     * @param Closure $next
+     * @return mixed
+     */
     public function handle(DOMDocument $dom, Closure $next)
     {
-        $fragment = $dom->createDocumentFragment();
-        $fragment->appendXML(<<<HTML
-        <div class="my-4 p-3 shadow rounded border border-green-500 text-center">
-            My Special Element
-        </div>
-        HTML);
-        $h1 = $dom->getElementsByTagName('h1')->item(0);
-        $body = $dom->getElementsByTagName('body')->item(0);
-        $body->replaceChild($fragment, $h1);
+        foreach ($dom->getElementsByTagName('img') as $node) {
+            $this->lazyLoad($node);
+        }
         return $next($dom);
+    }
+
+    /**
+     * @param DOMDocument $dom
+     * @param DOMNode $node
+     */
+    protected function lazyLoad(DOMNode $node): void
+    {
+        if (!$node->hasAttribute('data-src')) {
+            // Set the data-src attribute.
+            $node->setAttribute('data-src', $node->getAttribute('src'));
+
+            // Set the src attribute to loading image.
+            $node->setAttribute('src', asset('images/loading.gif'));
+
+            // Merge the lazy load class into the class list.
+            $node->setAttribute('class',join(' ', [
+                $node->getAttribute('class'),
+                'lazy-load'
+            ]));
+        }
+    }
+}
+```
+
+### YouTube Iframe to VueComponent
+
+Convert an iframe embed into a Vue Component.
+
+```php
+<?php declare(strict_types=1);
+
+namespace App\Services\Html\Formatters;
+
+use Closure;
+use DOMNode;
+use DOMDocument;
+
+class LazyLoadVideos
+{
+    /**
+     * @param DOMDocument $dom
+     * @param Closure $next
+     * @return mixed
+     */
+    public function handle(DOMDocument $dom, Closure $next)
+    {
+        $xpath = new \DOMXPath($dom);
+        foreach($xpath->query('//iframe[@class="media"]') as $node){
+            $this->lazyLoad($dom, $node);
+        }
+        return $next($dom);
+    }
+
+    /**
+     * @param DOMDocument $dom
+     * @param DOMNode $node
+     */
+    protected function lazyLoad(DOMDocument $dom, DOMNode $node): void
+    {
+        if(!$node->parentNode) return;
+
+        // Match the YouTube Video ID.
+        // https://stackoverflow.com/questions/2936467/parse-youtube-video-id-using-preg-match
+        preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i',
+            (string) $node->getAttribute('src'), $matches
+        );
+
+        if(isset($matches[1])){
+            // Create a new HTML fragment.
+            $fragment = $dom->createDocumentFragment();
+            $fragment->appendXML(<<<HTML
+            <v-video id="$matches[1]" label="Click to play..." :show-image="true"></v-video>
+            HTML);
+
+            // Replace Self with Fragment.
+            $node->parentNode->replaceChild($fragment, $node);
+        }
+    }
+}
+```
+
+
+### Table of Contents
+
+```php
+<?php declare(strict_types=1);
+
+namespace App\Services\Html\Formatters;
+
+use DOMNode;
+use Closure;
+use StdClass;
+use DOMDocument;
+
+use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\View;
+
+class TableOfContents
+{
+    /**
+     * @param DOMDocument $dom
+     * @param Closure $next
+     * @return mixed
+     */
+    public function handle(DOMDocument $dom, Closure $next)
+    {
+        $nodes = Collection::make();
+        $xpath = new \DOMXPath($dom);
+
+        foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
+            $text = strip_tags(html_entity_decode((string) $node->nodeValue));
+            $nodes->push($this->makeBookmark($node, $text));
+        }
+
+        if($nodes->count() > 5){
+            View::share('tableOfContents', $nodes->take(25));
+        }
+
+        return $next($dom);
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param string $text
+     * @return StdClass
+     */
+    protected function makeBookmark(DOMNode $node, string $text): StdClass
+    {
+        $anchor = (object)[
+          'anchor' => Str::slug($text),
+          'text'   => Str::title(Str::replaceLast('.', '', $text)),
+        ];
+        $node->setAttribute('id', $anchor);
+        return $anchor;
     }
 }
 ```
