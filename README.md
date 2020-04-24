@@ -37,7 +37,7 @@ $modified = DomPipeline::make($html, [
 ]);
 ```
 
-## Example Dom Pipe Class
+### Example Dom Pipe Class
 ```php
 use DOMDocument;
 use DOMXPath;
@@ -56,6 +56,7 @@ class UpdateHeaders{
 }
 ```
 
+### LazyLoad Images
 ```php
 <?php declare(strict_types=1);
 
@@ -103,9 +104,9 @@ class LazyLoadImages
 }
 ```
 
-### YouTube Iframe to VueComponent
+### Element to VueComponent
 
-Convert an iframe embed into a Vue Component.
+Convert an Iframe into a Vue Component extracting the video ID from the URL.
 
 ```php
 <?php declare(strict_types=1);
