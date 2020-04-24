@@ -277,3 +277,223 @@ class Tables
 }
 
 ```
+
+
+### Link Sanitizer
+
+```php
+<?php declare(strict_types=1);
+
+namespace App\Services\Html\Sanitizers;
+
+use Illuminate\Support\Str;
+use App\Repository;
+use DOMDocument;
+use DOMNode;
+
+class Links
+{
+    protected array $internalHosts = [
+        '//site.com',
+        '//www.site.com',
+        '//www.site.test',
+        '//staging.site.com',
+    ];
+
+    protected array $protocols = [
+        "https://",
+        "http://",
+        "//",
+    ];
+
+    protected array $mailable = [
+        "@username",
+        "mailto:",
+    ];
+
+    protected array $blackList = [
+        "target",
+        "rel",
+    ];
+
+    protected array $invalid = [
+        '#',
+    ];
+
+    public function handle(DOMDocument $dom, $next)
+    {
+        foreach($dom->getElementsByTagName('a') as $node){
+            $this->removeBlacklistedAttributes($node);
+            if ($this->isInvalidNode($node)) {
+                $this->unwrapNode($node);
+            } elseif ($this->isTelLink($node)) {
+                $this->formatTelLink($node);
+            } elseif ($this->isMailable($node)) {
+                $this->formatMailable($node);
+            } elseif ($this->isExternal($node)) {
+                $this->formatExternalLink($node);
+            } elseif ($this->isHomePage($node)) {
+                $this->formatHomepage($node);
+            } else {
+                $this->formatInternalLink($node);
+            }
+        }
+
+        return $next($dom);
+    }
+
+    protected function formatExternalLink(DOMNode $node): void
+    {
+        $node->setAttribute('target', '_blank');
+        $node->setAttribute('title', $this->makeTitleFromHost($node->getAttribute('href')));
+        $node->setAttribute('href', $this->fixProtocol($node->getAttribute('href')));
+    }
+
+    protected function formatMailable(DOMNode $node)
+    {
+        if(!$node->hasAttribute('title')){
+
+            $email = $this->condenseValue(
+                str_replace('mailto:', '', (string)$node->getAttribute('href'))
+            );
+
+            $node->setAttribute('title', "Send an Email to {$email}");
+        }
+    }
+
+    protected function formatHomepage(DOMNode $node)
+    {
+        $node->setAttribute('href', "/");
+        $node->setAttribute('title', config('app.name'));
+    }
+
+    protected function formatInternalLink(DOMNode $node)
+    {
+        $slug = $this->toLowerCaseSlug($node->getAttribute('href'));
+
+        $node->setAttribute('href', "/$slug");
+
+        if (!$node->hasAttribute('title')) {
+            $node->setAttribute('title',
+                $this->makeTitleFromUrl($node->getAttribute('href'))
+            );
+        }
+    }
+
+    protected function formatTelLink(DOMNode $node)
+    {
+        $formatted = $this->filterNumeric($node->getAttribute('href'));
+
+        if (empty($formatted)) {
+            $this->unwrapNode($node);
+            return;
+        }
+
+        if(!Str::startsWith($formatted, ['+'])){
+            $formatted = "+$formatted";
+        }
+
+        $node->setAttribute('href', "tel:{$formatted}");
+
+        if (!$node->hasAttribute('title')) {
+            $node->setAttribute('title', "Call {$formatted}");
+        }
+    }
+
+    protected function unwrapNode(DOMNode $node)
+    {
+        $node->nodeValue = strip_tags($node->nodeValue);
+    }
+
+    protected function removeBlacklistedAttributes(DOMNode $node)
+    {
+        foreach ($this->blackList as $attribute) {
+            $node->removeAttribute($attribute);
+        }
+    }
+
+    protected function isInvalidNode(DOMNode $node): bool
+    {
+        $href = $node->getAttribute('href');
+        return empty($href) || in_array($this->condenseValue($href), $this->invalid);
+    }
+
+    protected function condenseValue($value)
+    {
+        return trim((string)$value);
+    }
+
+    protected function isTelLink(DOMNode $node): bool
+    {
+        return Str::startsWith($this->condenseValue($node->getAttribute('href')), ['tel:', '+']);
+    }
+
+    protected function isExternal(DOMNode $node): bool
+    {
+        return !Str::contains($node->getAttribute('href'), $this->internalHosts) &&
+            Str::startsWith($node->getAttribute('href'), $this->protocols);
+    }
+
+    protected function isMailable(DOMNode $node): bool
+    {
+        return Str::contains($node->getAttribute('href'), $this->mailable);
+    }
+
+    protected function isHomePage(DOMNode $node): bool
+    {
+        return (
+            in_array($this->condenseValue($node->getAttribute('href')), ['/']) ||
+            in_array(trim((string)$node->getAttribute('title')), [config('app.name')]) ||
+            Str::contains((string)$node->getAttribute('href'), $this->internalHosts)
+        );
+    }
+
+    protected function safelyParsePath($original): string
+    {
+        return (string)parse_url((string)$original, PHP_URL_PATH);
+    }
+
+    protected function safelyParseHost($original): string
+    {
+        return (string)parse_url((string)$original, PHP_URL_HOST);
+    }
+
+    protected function toLowerCaseSlug($url): string
+    {
+        return str_replace('_', '-',
+            Str::lower(trim($this->safelyParsePath($url), '/'))
+        );
+    }
+
+    protected function hasInvalidProtocol($url)
+    {
+        return Str::startsWith((string)$url, ['//']);
+    }
+
+    protected function fixProtocol($url): string
+    {
+        if ($this->hasInvalidProtocol($url)) {
+            return "http:$url";
+        }
+        return $url;
+    }
+
+    protected function makeTitleFromUrl($url): string
+    {
+        return trim(Str::title($this->filterAlphaNumeric($url)));
+    }
+
+    protected function filterAlphaNumeric($url){
+        return preg_replace('/[^a-zA-Z0-9]/', ' ', (string)$url);
+    }
+
+    protected function filterNumeric($url){
+        return preg_replace('/[^0-9-+]/', '', (string)$url);
+    }
+
+    protected function makeTitleFromHost($url): string
+    {
+        return "Visit {$this->safelyParseHost($url)}";
+    }
+}
+```
