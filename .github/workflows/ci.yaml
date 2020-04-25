@@ -1,11 +1,11 @@
 name: ci
 on:
-push:
-  branches:
-    - dev
-  paths-ignore:
-    - 'README.md'
-    - 'LICENSE'
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
   pull_request:
     branches:
       - master
