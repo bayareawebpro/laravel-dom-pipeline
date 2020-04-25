@@ -26,11 +26,4 @@ abstract class TestCase extends BaseTestCase
             'DomPipeline' => DomPipeline::class,
         ];
     }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->app['config']->set('app.debug', true);
-        $this->app['config']->set('app.key', Str::random(32));
-    }
 }
