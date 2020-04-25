@@ -6,7 +6,6 @@
 ![](https://img.shields.io/packagist/dt/bayareawebpro/laravel-dom-pipeline.svg)
 ![](https://img.shields.io/badge/License-MIT-success.svg)
 
-
 ```shell script
 composer require bayareawebpro/laravel-dom-pipeline
 ```

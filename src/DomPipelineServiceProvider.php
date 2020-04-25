@@ -21,4 +21,13 @@ class DomPipelineServiceProvider extends ServiceProvider
     {
         $this->app->bind('dom-pipeline', DomPipelineService::class);
     }
+
+    /**
+     * Get the services provided by the provider.
+     * @return array
+     */
+    public function provides()
+    {
+        return ['dom-pipeline'];
+    }
 }

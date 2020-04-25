@@ -37,4 +37,11 @@ class ProviderTest extends TestCase
         $instance = app('dom-pipeline');
         $this->assertTrue(($instance instanceof DomPipelineService));
     }
+
+    public function test_declares_provided()
+    {
+        $this->assertTrue(in_array('dom-pipeline',
+                collect(app()->getProviders(DomPipelineServiceProvider::class))->first()->provides())
+        );
+    }
 }

@@ -2,8 +2,8 @@
 
 namespace BayAreaWebPro\DomPipeline\Tests;
 
-use BayAreaWebPro\DomPipeline\DomPipeline;
 use Illuminate\Support\Str;
+use BayAreaWebPro\DomPipeline\DomPipeline;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use BayAreaWebPro\DomPipeline\DomPipelineServiceProvider;
 
