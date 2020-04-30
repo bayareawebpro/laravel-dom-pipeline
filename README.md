@@ -62,7 +62,7 @@ class UpdateHeaders{
 namespace App\Services\Html\Formatters;
 
 use Closure;
-use DOMNode;
+use DOMElement;
 use DOMDocument;
 
 class LazyLoadImages
@@ -82,9 +82,9 @@ class LazyLoadImages
 
     /**
      * @param DOMDocument $dom
-     * @param DOMNode $node
+     * @param DOMElement $node
      */
-    protected function lazyLoad(DOMNode $node): void
+    protected function lazyLoad(DOMElement $node): void
     {
         if (!$node->hasAttribute('data-src')) {
             // Set the data-src attribute.
@@ -113,7 +113,7 @@ Convert an Iframe into a Vue Component extracting the video ID from the URL.
 namespace App\Services\Html\Formatters;
 
 use Closure;
-use DOMNode;
+use DOMElement;
 use DOMDocument;
 
 class LazyLoadVideos
@@ -134,9 +134,9 @@ class LazyLoadVideos
 
     /**
      * @param DOMDocument $dom
-     * @param DOMNode $node
+     * @param DOMElement $node
      */
-    protected function lazyLoad(DOMDocument $dom, DOMNode $node): void
+    protected function lazyLoad(DOMDocument $dom, DOMElement $node): void
     {
         if(is_null($node->parentNode)) return;
 
@@ -168,7 +168,7 @@ class LazyLoadVideos
 
 namespace App\Services\Html\Formatters;
 
-use DOMNode;
+use DOMElement;
 use Closure;
 use StdClass;
 use DOMDocument;
@@ -202,11 +202,11 @@ class TableOfContents
     }
 
     /**
-     * @param DOMNode $node
+     * @param DOMElement $node
      * @param string $text
      * @return StdClass
      */
-    protected function makeBookmark(DOMNode $node, string $text): StdClass
+    protected function makeBookmark(DOMElement $node, string $text): StdClass
     {
         // Create the bookmark item.
         $bookmark = (object)[
@@ -233,7 +233,7 @@ Convert tables to bootstrap equivalent style.
 namespace App\Services\Html\Formatters;
 
 use Closure;
-use DOMNode;
+use DOMElement;
 use DOMDocument;
 
 class Tables
@@ -255,9 +255,9 @@ class Tables
     /**
      * Wrap Responsive
      * @param DOMDocument $dom
-     * @param DOMNode $node
+     * @param DOMElement $node
      */
-    protected function makeResponsive(DOMDocument $dom, DOMNode $node): void
+    protected function makeResponsive(DOMDocument $dom, DOMElement $node): void
     {            
         if(is_null($node->parentNode)) return;
         
@@ -287,7 +287,7 @@ namespace App\Services\Html\Sanitizers;
 
 use Illuminate\Support\Str;
 use DOMDocument;
-use DOMNode;
+use DOMElement;
 use Closure;
 
 class Links
@@ -341,14 +341,14 @@ class Links
         return $next($dom);
     }
 
-    protected function formatExternalLink(DOMNode $node): void
+    protected function formatExternalLink(DOMElement $node): void
     {
         $node->setAttribute('target', '_blank');
         $node->setAttribute('title', $this->makeTitleFromHost($node->getAttribute('href')));
         $node->setAttribute('href', $this->fixProtocol($node->getAttribute('href')));
     }
 
-    protected function formatMailable(DOMNode $node): void
+    protected function formatMailable(DOMElement $node): void
     {
         if(!$node->hasAttribute('title')){
 
@@ -360,13 +360,13 @@ class Links
         }
     }
 
-    protected function formatHomepage(DOMNode $node): void
+    protected function formatHomepage(DOMElement $node): void
     {
         $node->setAttribute('href', "/");
         $node->setAttribute('title', config('app.name'));
     }
 
-    protected function formatInternalLink(DOMNode $node): void
+    protected function formatInternalLink(DOMElement $node): void
     {
         $slug = $this->toLowerCaseSlug($node->getAttribute('href'));
 
@@ -379,7 +379,7 @@ class Links
         }
     }
 
-    protected function formatTelLink(DOMNode $node): void
+    protected function formatTelLink(DOMElement $node): void
     {
         $formatted = $this->filterNumeric($node->getAttribute('href'));
 
@@ -399,19 +399,19 @@ class Links
         }
     }
 
-    protected function unwrapNode(DOMNode $node): void
+    protected function unwrapNode(DOMElement $node): void
     {
         $node->nodeValue = strip_tags($node->nodeValue);
     }
 
-    protected function removeBlacklistedAttributes(DOMNode $node): void
+    protected function removeBlacklistedAttributes(DOMElement $node): void
     {
         foreach ($this->blackList as $attribute) {
             $node->removeAttribute($attribute);
         }
     }
 
-    protected function isInvalidNode(DOMNode $node): bool
+    protected function isInvalidNode(DOMElement $node): bool
     {
         $href = $node->getAttribute('href');
         return empty($href) || in_array($this->condenseValue($href), $this->invalid);
@@ -422,23 +422,23 @@ class Links
         return trim((string)$value);
     }
 
-    protected function isTelLink(DOMNode $node): bool
+    protected function isTelLink(DOMElement $node): bool
     {
         return Str::startsWith($this->condenseValue($node->getAttribute('href')), ['tel:', '+']);
     }
 
-    protected function isExternal(DOMNode $node): bool
+    protected function isExternal(DOMElement $node): bool
     {
         return !Str::contains($node->getAttribute('href'), $this->internalHosts) &&
             Str::startsWith($node->getAttribute('href'), $this->protocols);
     }
 
-    protected function isMailable(DOMNode $node): bool
+    protected function isMailable(DOMElement $node): bool
     {
         return Str::contains($node->getAttribute('href'), $this->mailable);
     }
 
-    protected function isHomePage(DOMNode $node): bool
+    protected function isHomePage(DOMElement $node): bool
     {
         return (
             in_array($this->condenseValue($node->getAttribute('href')), ['/']) ||
