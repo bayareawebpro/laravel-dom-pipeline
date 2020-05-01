@@ -37,6 +37,9 @@ $modified = DomPipeline::make($html, [
 ```
 
 ### Example Dom Pipe Class
+
+> Docs: https://www.php.net/manual/en/book.dom.php
+
 ```php
 use DOMDocument;
 use DOMXPath;
