@@ -19,13 +19,13 @@
         "php": "^7.4|^8.0",
         "ext-dom": "*",
         "ext-libxml": "*",
-        "illuminate/pipeline": "^6.0|^7.0|^8.0",
-        "illuminate/support": "^6.0|^7.0|^8.0"
+        "illuminate/pipeline": "^6.0|^7.0|^8.0|^9.0",
+        "illuminate/support": "^6.0|^7.0|^8.0|^9.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0|^8.0|^9.0",
-        "orchestra/testbench": "^5.0|^6.0",
-        "nunomaduro/larastan": "^0.6"
+        "orchestra/testbench": "^5.0|^6.0|^7.0",
+        "nunomaduro/larastan": "^0.6|^1.0"
     },
     "autoload": {
         "psr-4": {
