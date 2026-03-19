@@ -5,6 +5,7 @@ namespace BayAreaWebPro\DomPipeline\Tests\Unit;
 use BayAreaWebPro\DomPipeline\Tests\TestCase;
 use BayAreaWebPro\DomPipeline\DomPipeline;
 use DOMDocument;
+use DOMElement;
 use DOMXPath;
 
 class DefaultTest extends TestCase
@@ -24,6 +25,9 @@ class DefaultTest extends TestCase
             new class{
                 public function handle(DOMDocument $dom, \Closure $next){
                     $xpath = new DOMXPath($dom);
+                    /**
+                     * @var DOMElement $node
+                     */
                     foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
                         $node->nodeValue = $node->tagName;
                     }
@@ -33,6 +37,9 @@ class DefaultTest extends TestCase
             new class{
                 public function handle(DOMDocument $dom, \Closure $next){
                     $xpath = new DOMXPath($dom);
+                    /**
+                     * @var DOMElement $node
+                     */
                     foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
                         $node->setAttribute("class", "edited");
                     }
@@ -60,6 +67,9 @@ class DefaultTest extends TestCase
             new class{
                 public function handle(DOMDocument $dom, \Closure $next){
                     $xpath = new DOMXPath($dom);
+                    /**
+                     * @var DOMElement $node
+                     */
                     foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
                         $node->nodeValue = $node->tagName;
                     }
