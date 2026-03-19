@@ -27,6 +27,7 @@ class DomParser
         HTML
         );
         libxml_clear_errors();
+        libxml_use_internal_errors(false);
         return $doc;
     }
 
