@@ -37,24 +37,6 @@ $modified = DomPipeline::make($html, [
 
 > Docs: https://www.php.net/manual/en/book.dom.php
 
-```php
-use DOMDocument;
-use DOMXPath;
-use Closure;
-
-class UpdateHeaders{
-    public function handle(DOMDocument $dom, Closure $next)
-    {
-        $xpath = new DOMXPath($dom);
-        foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6') as $node) {
-            // Change the header tags content.
-            $node->nodeValue = "This is a {$node->tagName} tag.";
-        }
-        return $next($dom);
-    }
-}
-```
-
 ### LazyLoad Images
 ```php
 <?php declare(strict_types=1);
@@ -67,11 +49,6 @@ use DOMDocument;
 
 class LazyLoadImages
 {
-    /**
-     * @param DOMDocument $dom
-     * @param Closure $next
-     * @return mixed
-     */
     public function handle(DOMDocument $dom, Closure $next)
     {
         foreach ($dom->getElementsByTagName('img') as $node) {
@@ -80,24 +57,10 @@ class LazyLoadImages
         return $next($dom);
     }
 
-    /**
-     * @param DOMDocument $dom
-     * @param DOMElement $node
-     */
     protected function lazyLoad(DOMElement $node): void
     {
-        if (!$node->hasAttribute('data-src')) {
-            // Set the data-src attribute.
-            $node->setAttribute('data-src', $node->getAttribute('src'));
-
-            // Set the src attribute to loading image.
-            $node->setAttribute('src', asset('images/loading.gif'));
-
-            // Merge the lazy load class into the class list.
-            $node->setAttribute('class',join(' ', [
-                $node->getAttribute('class'),
-                'lazy-load'
-            ]));
+        if (!$node->hasAttribute('loading')) {
+            $node->setAttribute('loading', 'lazy');
         }
     }
 }
@@ -118,11 +81,6 @@ use DOMDocument;
 
 class LazyLoadVideos
 {
-    /**
-     * @param DOMDocument $dom
-     * @param Closure $next
-     * @return mixed
-     */
     public function handle(DOMDocument $dom, Closure $next)
     {
         $xpath = new \DOMXPath($dom);
@@ -132,10 +90,6 @@ class LazyLoadVideos
         return $next($dom);
     }
 
-    /**
-     * @param DOMDocument $dom
-     * @param DOMElement $node
-     */
     protected function lazyLoad(DOMDocument $dom, DOMElement $node): void
     {
         if(is_null($node->parentNode)) return;
@@ -179,11 +133,6 @@ use Illuminate\Support\Facades\View;
 
 class TableOfContents
 {
-    /**
-     * @param DOMDocument $dom
-     * @param Closure $next
-     * @return mixed
-     */
     public function handle(DOMDocument $dom, Closure $next)
     {
         $nodes = Collection::make();
@@ -201,20 +150,13 @@ class TableOfContents
         return $next($dom);
     }
 
-    /**
-     * @param DOMElement $node
-     * @param string $text
-     * @return StdClass
-     */
     protected function makeBookmark(DOMElement $node, string $text): StdClass
     {
-        // Create the bookmark item.
         $bookmark = (object)[
           'anchor' => Str::slug($text),
           'text'   => Str::title(Str::replaceLast('.', '', $text)),
         ];
 
-        // Link the bookmark to the header using the ID.
         $node->setAttribute('id', $bookmark->anchor);
 
         return $bookmark;
