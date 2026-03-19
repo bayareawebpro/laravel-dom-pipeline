@@ -5,7 +5,7 @@ namespace BayAreaWebPro\DomPipeline;
 use DOMDocument;
 use Illuminate\Support\Str;
 
-class DomParser
+class DomFragmentParser
 {
     /**
      * "mb_convert_encoding" is deprecated.
@@ -24,14 +24,13 @@ class DomParser
             </head>
             <body>$html</body>
         </html>
-        HTML
-        );
+        HTML);
         libxml_clear_errors();
         libxml_use_internal_errors(false);
         return $doc;
     }
 
-    public static function getBodyHtml(DOMDocument $dom): string
+    public static function saveHTML(DOMDocument $dom): string
     {
         $html = $dom->saveHTML($dom->getElementsByTagName('body')->item(0));
 

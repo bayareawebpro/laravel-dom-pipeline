@@ -18,16 +18,17 @@ class DomPipelineService
     {
         return App::make(static::class, compact('pipes'))->process($html);
     }
-    protected function process(string|null $html): ?string
+
+    protected function process(string|null $html): string|null
     {
         if (empty($html)) return $html;
 
         return $this->pipeline
-            ->send(DomParser::make($html))
+            ->send(DomFragmentParser::make($html))
             ->through($this->pipes)
             ->via('handle')
             ->then(function (DOMDocument $dom) {
-                return DomParser::getBodyHtml($dom);
+                return DomFragmentParser::saveHTML($dom);
             });
     }
 }
