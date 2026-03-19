@@ -14,11 +14,8 @@ composer require bayareawebpro/laravel-dom-pipeline
 
 Laravel DOM Pipeline allows you to pipe HTML content through a series of classes 
 which can be helpful with sanitization and server-side enhancement / modification of page 
-elements. The pipeline will not return the `<body>` tag or any other tags outside of the 
+elements. The pipeline will not return the `<body>` tag or any other tags outside the 
 body scope. 
-
-> "libxml_use_internal_errors" is enabled allow any type of tag to operated on. 
-See DomPipelineService::class (line 25).
 
 ## Usage: 
 ```php
